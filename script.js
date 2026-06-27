@@ -7,22 +7,26 @@ async function send() {
 
   // Show user message
   chatBox.innerHTML += `<div class="msg user">${message}</div>`;
-
   input.value = "";
 
-  // Call API
-  const res = await fetch("/.netlify/functions/chat", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ message })
-  });
+  try {
+    const res = await fetch("/.netlify/functions/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  // Show bot reply
-  chatBox.innerHTML += `<div class="msg bot">${data.reply}</div>`;
+    // ✅ FIX HERE
+    const reply = data.reply || data.error || "No response from AI";
 
-  chatBox.scrollTop = chatBox.scrollHeight;
+    chatBox.innerHTML += `<div class="msg bot">${reply}</div>`;
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+  } catch (err) {
+    chatBox.innerHTML += `<div class="msg bot">Error: Server issue</div>`;
+  }
 }
